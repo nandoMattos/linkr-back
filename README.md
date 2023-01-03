@@ -1,3 +1,5 @@
+LINK DEPLOY FRONT-END: https://projeto18-linkr-front-three.vercel.app
+
 LINK DEPLOY BACK-END: https://api-linkr.onrender.com (⚠️ BANCO AINDA NÃO CONFIGURADO)
 
 Para testar localmente, use:
