@@ -23,10 +23,15 @@ export async function userAlreadyLikedPostMiddleware(req, res, next) {
       res.locals.userId,
       req.params.id
     );
-    console.log(isPostLiked.rows);
 
-    if (isPostLiked.rows[0]) {
-      res.status(400).send("O usuário já curtiu esse post");
+    let verification;
+
+    req.method === "POST"
+      ? (verification = isPostLiked.rows[0] != undefined)
+      : (verification = isPostLiked.rows[0] === undefined);
+
+    if (verification) {
+      res.sendStatus(400);
       return;
     }
 

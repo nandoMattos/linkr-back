@@ -31,7 +31,7 @@ function doesUserLikedPost(userId, postId) {
     SELECT *
     FROM likes
     WHERE id_user = $1
-      AND id_post = $2
+      AND id_post = $2;
   `,
     [userId, postId]
   );
@@ -49,11 +49,23 @@ function likePost(userId, postId) {
   );
 }
 
+function deleteLike(userId, postId) {
+  return connection.query(
+    `
+    DELETE FROM likes
+    WHERE id_user = $1
+      AND id_post = $2;
+  `,
+    [userId, postId]
+  );
+}
+
 const postsRepository = {
   getPostsWithTag,
   getPostById,
   doesUserLikedPost,
   likePost,
+  deleteLike,
 };
 
 export default postsRepository;

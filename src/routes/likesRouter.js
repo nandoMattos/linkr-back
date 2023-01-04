@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { likePost } from "../controllers/postsController.js";
+import { deslikePost, likePost } from "../controllers/postsController.js";
 
 import {
   postExistsValidationMiddleware,
@@ -15,6 +15,11 @@ router.post(
   likePost
 );
 
-router.delete("/post/:id/deslike");
+router.delete(
+  "/posts/:id/deslike",
+  postExistsValidationMiddleware,
+  userAlreadyLikedPostMiddleware,
+  deslikePost
+);
 
 export default router;
