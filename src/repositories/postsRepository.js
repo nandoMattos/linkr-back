@@ -103,6 +103,20 @@ function deleteLike(userId, postId) {
   );
 }
 
+function searchHashtag(hashtag) {
+  return connection.query(
+    `
+    SELECT name FROM hashtags
+    WHERE name = $1
+  `,
+    [hashtag]
+  );
+}
+
+// function createHashtag (hashtag) {
+  
+// }
+
 const postsRepository = {
   getPostsWithTag,
   getPostById,
@@ -110,7 +124,8 @@ const postsRepository = {
   doesUserLikedPost,
   likePost,
   deleteLike,
-  getAllPosts
+  getAllPosts,
+  searchHashtag
 };
 
 export default postsRepository;

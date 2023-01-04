@@ -61,3 +61,18 @@ export async function getAllPostsByUserId(req, res){
     res.sendStatus(500);
   }
 }
+
+export async function createPost (req, res) {
+  const {username, userId} = res.locals.user;
+  const {url, description} = req.body;
+
+  const hashtags = description.trim().match(/(#[A-Za-z0-9]*)/g).map(el => el.replace('#', ""));
+
+  try {
+    const hashExist = hashtags.map(async (hashtag) => await postsRepository.searchHashtag(hashtag));
+    console.log(hashExist);
+  } catch (error){
+    console.log(error)
+    res.sendStatus(500);
+  }
+}
