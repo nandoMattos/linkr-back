@@ -53,4 +53,6 @@ export async function postValidateSchema (req, res, next) {
     return res.sendStatus(400).send( {message: errors});
   }
 
+  next();
+
 }
