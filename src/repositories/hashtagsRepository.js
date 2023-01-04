@@ -5,7 +5,7 @@ function getTrendings() {
     `
     SELECT name 
     FROM hashtags
-    ORDER BY views DESC
+    ORDER BY posts_amount DESC
     LIMIT 10;
   `
   );
@@ -25,7 +25,6 @@ function getHashtagByName(tagName) {
 const hashtagsRepository = {
   getTrendings,
   getHashtagByName,
-  incrementView,
 };
 
 export default hashtagsRepository;
