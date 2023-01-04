@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deslikePost, likePost } from "../controllers/postsController.js";
+import { deslikePost, getAllPosts, likePost } from "../controllers/postsController.js";
 
 import {
   postExistsValidationMiddleware,
@@ -7,6 +7,8 @@ import {
 } from "../middlewares/postsMiddleware.js";
 
 const router = Router();
+
+router.get("/posts", getAllPosts);
 
 router.post(
   "/posts/:id/like",
