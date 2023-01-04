@@ -40,3 +40,24 @@ export async function getAllPosts(req, res) {
     res.sendStatus(500);
   }
 }
+
+
+export async function getAllPostsByUserId(req, res){
+  const id = req.params.id;
+
+  try {
+    const { rows } = await postsRepository.getAllPostsByUserId(id);
+
+    for(const post of rows) {
+      const metadata = await urlMetadata(post.url);
+      post.title = metadata.title;
+      post.image = metadata.image;
+      post.linkDescription = metadata.description;
+    }
+
+    res.send(rows);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+}
