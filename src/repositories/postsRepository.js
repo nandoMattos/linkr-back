@@ -14,8 +14,58 @@ function getPostsWithTag(tagId) {
   );
 }
 
+function getPostById(postId) {
+  return connection.query(
+    `
+    SELECT *
+    FROM posts 
+    WHERE id = $1;
+  `,
+    [postId]
+  );
+}
+
+function doesUserLikedPost(userId, postId) {
+  return connection.query(
+    `
+    SELECT *
+    FROM likes
+    WHERE id_user = $1
+      AND id_post = $2;
+  `,
+    [userId, postId]
+  );
+}
+
+function likePost(userId, postId) {
+  return connection.query(
+    `
+    INSERT INTO likes
+    (id_user, id_post)
+    VALUES
+    ($1, $2);
+  `,
+    [userId, postId]
+  );
+}
+
+function deleteLike(userId, postId) {
+  return connection.query(
+    `
+    DELETE FROM likes
+    WHERE id_user = $1
+      AND id_post = $2;
+  `,
+    [userId, postId]
+  );
+}
+
 const postsRepository = {
   getPostsWithTag,
+  getPostById,
+  doesUserLikedPost,
+  likePost,
+  deleteLike,
 };
 
 export default postsRepository;
