@@ -16,7 +16,7 @@ export async function deslikePost(req, res) {
   try {
     await postsRepository.deleteLike(res.locals.userId, req.params.id);
 
-    res.send(204);
+    res.sendStatus(204);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
