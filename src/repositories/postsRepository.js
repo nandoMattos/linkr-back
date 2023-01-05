@@ -2,7 +2,7 @@ import connection from "../database/db.js";
 
 function getAllPosts() {
   return connection.query(`
-    SELECT u.id, u.username, u.picture_url as profilePicture, p.url, p.description,
+    SELECT p.id, u.username, u.picture_url as profilePicture, p.url, p.description,
       json_agg(
         DISTINCT h.name
       ) as "hashtags",

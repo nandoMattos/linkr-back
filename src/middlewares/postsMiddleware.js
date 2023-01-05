@@ -18,7 +18,7 @@ export async function postExistsValidationMiddleware(req, res, next) {
 }
 
 export async function userAlreadyLikedPostMiddleware(req, res, next) {
-  res.locals.userId = 2;
+  res.locals.userId = 4;
   try {
     const isPostLiked = await postsRepository.doesUserLikedPost(
       res.locals.userId,

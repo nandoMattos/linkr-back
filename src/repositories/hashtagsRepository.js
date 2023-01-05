@@ -3,7 +3,7 @@ import connection from "../database/db.js";
 function getTrendings() {
   return connection.query(
     `
-    SELECT name 
+    SELECT id, name
     FROM hashtags
     ORDER BY posts_amount DESC
     LIMIT 10;
