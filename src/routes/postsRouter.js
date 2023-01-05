@@ -9,8 +9,6 @@ import {
 
 const router = Router();
 
-router.post ("/posts", postValidateSchema, createPost);
-
 router.get("/posts", getAllPosts);
 
 router.get("/posts/user/:id", getAllPostsByUserId);
@@ -29,5 +27,6 @@ router.delete(
   deslikePost
 );
 
+router.post ("/posts", postValidateSchema, createPost);
 
 export default router;
