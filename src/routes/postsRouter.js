@@ -27,6 +27,6 @@ router.delete(
   deslikePost
 );
 
-router.post ("/post", postValidateSchema, createPost);
+router.post ("/posts", postValidateSchema, createPost);
 
 export default router;

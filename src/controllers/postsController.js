@@ -42,13 +42,13 @@ export async function getAllPosts(req, res) {
 }
 
 
-export async function getAllPostsByUserId(req, res){
+export async function getAllPostsByUserId(req, res) {
   const id = req.params.id;
 
   try {
     const { rows } = await postsRepository.getAllPostsByUserId(id);
 
-    for(const post of rows) {
+    for (const post of rows) {
       const metadata = await urlMetadata(post.url);
       post.title = metadata.title;
       post.image = metadata.image;
@@ -62,16 +62,35 @@ export async function getAllPostsByUserId(req, res){
   }
 }
 
-export async function createPost (req, res) {
-  const {username, userId} = res.locals.user;
-  const {url, description} = req.body;
+export  async function createPost(req, res) {
+  //const {username, userId} = res.locals.user;
+  const { url, description } = req.body;
 
-  const hashtags = description.trim().match(/(#[A-Za-z0-9]*)/g).map(el => el.replace('#', ""));
+  const hashtags = description?.trim().match(/(#[A-Za-z0-9]*)/g).map(el => el.replace('#', ""));
+  console.log(hashtags);
 
   try {
-    const hashExist = hashtags.map(async (hashtag) => await postsRepository.searchHashtag(hashtag));
-    console.log(hashExist);
-  } catch (error){
+
+    if (hashtags) {
+      const newHashtags = [];
+      const sumHashtag = [];
+      //const hashExist = hashtags?.map(async (hashtag) => await postsRepository.searchHashtag(hashtag));
+      for (const hashtag of hashtags ) {
+        const { rows } = await postsRepository.searchHashtag(hashtag);
+        if (rows[0]?.name) sumHashtag.push(rows[0].name);
+        if (!rows[0]?.name) newHashtags.push(hashtag);
+      }
+
+      for (const hashtag of newHashtags) await postsRepository.addNewHashtag(hashtag);
+      
+      for (const hashtag of sumHashtag) await postsRepository.sumTag(hashtag);
+
+      console.log(newHashtags);
+      console.log(sumHashtag);
+    }
+
+    res.sendStatus(200);
+  } catch (error) {
     console.log(error)
     res.sendStatus(500);
   }
