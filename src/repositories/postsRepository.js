@@ -143,6 +143,16 @@ function sumTag (hashtag) {
   );
 }
 
+function addNewPost(userId, url, description) {
+  return connection.query(
+    `
+    INSERT INTO posts (id_user, url, description)
+    VALUES ($1. $2, $3)
+    `,
+    [userId, url, description]
+  )
+}
+
 const postsRepository = {
   getPostsWithTag,
   getPostById,
@@ -153,7 +163,8 @@ const postsRepository = {
   getAllPosts,
   searchHashtag,
   addNewHashtag,
-  sumTag
+  sumTag,
+  addNewPost
 };
 
 export default postsRepository;
