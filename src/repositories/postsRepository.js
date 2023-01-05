@@ -113,9 +113,14 @@ function searchHashtag(hashtag) {
   );
 }
 
-// function createHashtag (hashtag) {
-  
-// }
+function addNewHashtag (hashtag) {
+  return connection.query(
+    `
+    INSERT INTO hashtags (name) VALUES ($1)
+    `,
+    [hashtag]
+  );
+}
 
 const postsRepository = {
   getPostsWithTag,
@@ -125,7 +130,8 @@ const postsRepository = {
   likePost,
   deleteLike,
   getAllPosts,
-  searchHashtag
+  searchHashtag,
+  addNewHashtag
 };
 
 export default postsRepository;
