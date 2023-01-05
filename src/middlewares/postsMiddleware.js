@@ -1,4 +1,5 @@
 import postsRepository from "../repositories/postsRepository.js";
+import publishSchema from "../schemas/publishSchema.js";
 
 export async function postExistsValidationMiddleware(req, res, next) {
   try {
@@ -17,7 +18,7 @@ export async function postExistsValidationMiddleware(req, res, next) {
 }
 
 export async function userAlreadyLikedPostMiddleware(req, res, next) {
-  res.locals.userId = 3;
+  res.locals.userId = 1;
   try {
     const isPostLiked = await postsRepository.doesUserLikedPost(
       res.locals.userId,
@@ -40,4 +41,18 @@ export async function userAlreadyLikedPostMiddleware(req, res, next) {
     console.log(err);
     res.sendStatus(500);
   }
+}
+
+export async function postValidateSchema (req, res, next) {
+  const post = req.body;
+
+  const { error } = publishSchema.validate(post, {abortEarly: false});
+
+  if (error) {
+    const errors = error.details.map( (detail) => detail.message);
+    return res.sendStatus(400).send( {message: errors});
+  }
+
+  next();
+
 }

@@ -12,7 +12,6 @@ export async function tagExistsValidationMiddleware(req, res, next) {
       return;
     }
 
-    hashtagsRepository.incrementView(tagExists.rows[0].id);
     res.locals.tagId = tagExists.rows[0].id;
     next();
   } catch (err) {
