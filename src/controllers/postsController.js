@@ -81,9 +81,9 @@ export  async function createPost(req, res) {
         if (!rows[0]?.name) newHashtags.push(hashtag);
       }
 
-      for (const hashtag of newHashtags) {
-        await postsRepository.addNewHashtag(hashtag);
-      }
+      for (const hashtag of newHashtags) await postsRepository.addNewHashtag(hashtag);
+      
+      for (const hashtag of sumHashtag) await postsRepository.sumTag(hashtag);
 
       console.log(newHashtags);
       console.log(sumHashtag);
