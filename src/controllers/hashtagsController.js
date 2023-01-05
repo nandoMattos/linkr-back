@@ -16,7 +16,7 @@ export async function getPostsWithTag(req, res) {
       res.locals.tagId
     );
 
-    console.log(postsWithTag.rows);
+    res.send(postsWithTag.rows);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
