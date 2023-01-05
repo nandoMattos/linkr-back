@@ -1,7 +1,7 @@
 import joi from "joi";
 
 const publishSchema = joi.object({
-    url: joi.uri().required(),
+    url: joi.string().uri().required(),
     description: joi.string().max(400)
 })
 
