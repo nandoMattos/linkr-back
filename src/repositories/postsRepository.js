@@ -128,6 +128,7 @@ function addNewHashtag (hashtag) {
   return connection.query(
     `
     INSERT INTO hashtags (name) VALUES ($1)
+    RETURNING id
     `,
     [hashtag]
   );
@@ -138,6 +139,7 @@ function sumTag (hashtag) {
     `
     UPDATE hashtags SET posts_amount = posts_amount + 1
     WHERE name = $1
+    RETURNING id
     `,
     [hashtag]
   );
@@ -147,9 +149,20 @@ function addNewPost(userId, url, description) {
   return connection.query(
     `
     INSERT INTO posts (id_user, url, description)
-    VALUES ($1. $2, $3)
+    VALUES ($1, $2, $3)
+    RETURNING id
     `,
     [userId, url, description]
+  );
+}
+
+function postXHash(idHashtag, idPost) {
+  return connection.query(
+    `
+    INSERT INTO post_hashtag (id_post, id_hashtag)
+    VALUES ($1, $2)
+    `,
+    [idPost, idHashtag]
   )
 }
 
@@ -164,7 +177,8 @@ const postsRepository = {
   searchHashtag,
   addNewHashtag,
   sumTag,
-  addNewPost
+  addNewPost,
+  postXHash
 };
 
 export default postsRepository;

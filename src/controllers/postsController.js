@@ -62,31 +62,44 @@ export async function getAllPostsByUserId(req, res) {
   }
 }
 
-export  async function createPost(req, res) {
+export async function createPost(req, res) {
   //const {username, userId} = res.locals.user;
+  const userId = 3;
   const { url, description } = req.body;
 
-  const hashtags = description?.trim().match(/(#[A-Za-z0-9]*)/g).map(el => el.replace('#', ""));
+  const hashtags = description?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
   console.log(hashtags);
 
   try {
-
+    const hashtagsId = [];
     if (hashtags) {
       const newHashtags = [];
       const sumHashtag = [];
       //const hashExist = hashtags?.map(async (hashtag) => await postsRepository.searchHashtag(hashtag));
-      for (const hashtag of hashtags ) {
+      for (const hashtag of hashtags) {
         const { rows } = await postsRepository.searchHashtag(hashtag);
         if (rows[0]?.name) sumHashtag.push(rows[0].name);
         if (!rows[0]?.name) newHashtags.push(hashtag);
       }
 
-      for (const hashtag of newHashtags) await postsRepository.addNewHashtag(hashtag);
-      
-      for (const hashtag of sumHashtag) await postsRepository.sumTag(hashtag);
+      for (const hashtag of newHashtags) {
+        const { rows } = await postsRepository.addNewHashtag(hashtag);
+        hashtagsId.push(rows[0].id);
+      }
 
+      for (const hashtag of sumHashtag) {
+        const { rows } = await postsRepository.sumTag(hashtag);
+        hashtagsId.push(rows[0].id);
+      }
       console.log(newHashtags);
       console.log(sumHashtag);
+    }
+    console.log(hashtagsId)
+    const { rows } = await postsRepository.addNewPost(userId, url, description);
+    const idPost = rows[0].id;
+
+    if (hashtags) {
+      for (const idHashtag of hashtagsId) await postsRepository.postXHash(idHashtag, idPost)
     }
 
     res.sendStatus(200);
