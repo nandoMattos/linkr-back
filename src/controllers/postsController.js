@@ -3,9 +3,9 @@ import urlMetadata from "url-metadata";
 
 export async function likePost(req, res) {
   try {
-    await postsRepository.likePost(res.locals.userId, req.params.id);
+    await postsRepository.insertLike(res.locals.userId, req.params.id);
 
-    res.send(201);
+    res.sendStatus(201);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);

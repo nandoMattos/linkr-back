@@ -46,12 +46,23 @@ function getAllPostsByUserId(id) {
 function getPostsWithTag(tagId) {
   return connection.query(
     `
-    SELECT u.name, u.picture_url, p.url, p.description, h.name
-    FROM users u
-    JOIN posts p ON u.id = p.id_user
-    JOIN post_hashtag ph ON p.id = ph.id_post
-    JOIN hashtags h ON h.id = ph.id_hashtag
-    WHERE h.id = $1;
+    SELECT u.username, u.picture_url as profilePicture, p.url, p.description,
+    json_agg(
+      DISTINCT h.name
+    ) as "hashtags",
+    json_agg(
+      DISTINCT like_user.username
+    ) as "likedBy"
+    FROM posts p
+      JOIN users u ON p.id_user = u.id
+      LEFT JOIN post_hashtag ph ON p.id = ph.id_post 
+      LEFT JOIN hashtags h ON h.id = ph.id_hashtag
+      LEFT JOIN likes l ON l.id_post = p.id
+      LEFT JOIN users like_user ON like_user.id = l.id_user
+    WHERE h.id = $1
+    GROUP BY p.id, u.id
+    ORDER BY p.created_at DESC
+    LIMIT 20;
   `,
     [tagId]
   );
@@ -80,7 +91,7 @@ function doesUserLikedPost(userId, postId) {
   );
 }
 
-function likePost(userId, postId) {
+function insertLike(userId, postId) {
   return connection.query(
     `
     INSERT INTO likes
@@ -137,7 +148,7 @@ const postsRepository = {
   getPostById,
   getAllPostsByUserId,
   doesUserLikedPost,
-  likePost,
+  insertLike,
   deleteLike,
   getAllPosts,
   searchHashtag,
