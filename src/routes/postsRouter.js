@@ -11,9 +11,9 @@ import {
 
 const router = Router();
 
-router.get("/posts", getAllPosts);
+router.get("/posts", validateUserToken, getAllPosts);
 
-router.get("/posts/user/:id", getAllPostsByUserId);
+router.get("/posts/user/:id", validateUserToken, getAllPostsByUserId);
 
 router.post(
   "/posts/:id/like",
