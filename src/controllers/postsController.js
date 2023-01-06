@@ -3,7 +3,7 @@ import urlMetadata from "url-metadata";
 
 export async function likePost(req, res) {
   try {
-    await postsRepository.insertLike(res.locals.userId, req.params.id);
+    await postsRepository.insertLike(res.locals.id_user, req.params.id);
 
     res.sendStatus(201);
   } catch (err) {
@@ -14,7 +14,7 @@ export async function likePost(req, res) {
 
 export async function deslikePost(req, res) {
   try {
-    await postsRepository.deleteLike(res.locals.userId, req.params.id);
+    await postsRepository.deleteLike(res.locals.id_user, req.params.id);
 
     res.sendStatus(204);
   } catch (err) {
@@ -107,4 +107,37 @@ export async function createPost(req, res) {
     console.log(error)
     res.sendStatus(500);
   }
+}
+
+export async function deletePost(req, res) {
+  const description = res.locals.description;
+  const { postId }= req.body;
+  const hashtagsId = []
+
+  const hashtags = description?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
+  console.log({ hashtags: hashtags});
+
+  try {
+
+    if (hashtags) {
+      console.log("nao entra aqui");
+      for (const hashtag of hashtags) {
+        const { rows } = await postsRepository.subTag(hashtag);
+        hashtagsId.push(rows[0].id);
+      }
+
+      for (const hashtag of hashtagsId) {
+        const { rows } = await postsRepository.removepostXHash(hashtag, postId);
+      }
+    }
+    console.log(hashtagsId)
+
+    await postsRepository.removeLikes(postId);
+    await postsRepository.removePost(postId);
+    res.sendStatus(200);
+  } catch(error) {
+    console.log(error);
+    res.sendStatus(500)
+  }
+
 }

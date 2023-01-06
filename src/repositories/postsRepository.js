@@ -124,7 +124,7 @@ function searchHashtag(hashtag) {
   );
 }
 
-function addNewHashtag (hashtag) {
+function addNewHashtag(hashtag) {
   return connection.query(
     `
     INSERT INTO hashtags (name) VALUES ($1)
@@ -134,7 +134,7 @@ function addNewHashtag (hashtag) {
   );
 }
 
-function sumTag (hashtag) {
+function sumTag(hashtag) {
   return connection.query(
     `
     UPDATE hashtags SET posts_amount = posts_amount + 1
@@ -163,7 +163,58 @@ function postXHash(idHashtag, idPost) {
     VALUES ($1, $2)
     `,
     [idPost, idHashtag]
-  )
+  );
+}
+
+function postXUser(userId, postId) {
+  return connection.query(
+    `
+    SELECT description FROM posts
+    WHERE id = $1 AND id_user = $2
+    `,
+    [postId, userId]
+  );
+}
+
+function subTag(hashtag) {
+  return connection.query(
+    `
+    UPDATE hashtags SET posts_amount = posts_amount - 1
+    WHERE name = $1
+    RETURNING id
+    `,
+    [hashtag]
+  );
+}
+
+export function removepostXHash(hashtag, postId) {
+  return connection.query(
+    `
+    DELETE FROM post_hashtag 
+    WHERE id_hashtag = $1 AND id_post = $2
+    `,
+    [hashtag, postId]
+  );
+}
+
+export function removePost(postId) {
+  return connection.query(
+    `
+    DELETE FROM posts 
+    WHERE  id = $1
+    `, 
+    [postId]
+  );
+}
+
+export function removeLikes(postId) {
+  return connection.query(
+    `
+    DELETE FROM likes 
+    WHERE  id_post = $1
+    `, 
+    [postId]
+  );
 }
 
 const postsRepository = {
@@ -178,7 +229,12 @@ const postsRepository = {
   addNewHashtag,
   sumTag,
   addNewPost,
-  postXHash
+  postXHash,
+  postXUser,
+  subTag,
+  removepostXHash,
+  removePost,
+  removeLikes
 };
 
 export default postsRepository;
