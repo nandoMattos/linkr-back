@@ -58,14 +58,17 @@ export async function postValidateSchema (req, res, next) {
 
 export async function postBelongsUser(req, res, next) {
   const userId = res.locals.id_user;
-  const { postId } = req.body;
+  const postId  = Number(req.params.postId);
   console.log([userId, postId]);
+
+  if (!postId) return res.sendStatus(404);
 
   try {
     const result = await postsRepository.postXUser(userId, postId);
-    console.log(result.rows[0].description)
+    
 
     if (result.rowCount === 0) return res.status(401).send({message: "Não é permitido apagar o post de outro usuário"});
+
     res.locals.description = result.rows[0].description;
     
     next();
