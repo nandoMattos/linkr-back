@@ -3,6 +3,7 @@ import { createPost, deslikePost, getAllPosts, getAllPostsByUserId, likePost } f
 import {validateUserToken} from "../middlewares/userTokenMiddleware.js"
 
 import {
+  postBelongsUser,
   postExistsValidationMiddleware,
   postValidateSchema,
   userAlreadyLikedPostMiddleware,
@@ -31,5 +32,10 @@ router.delete(
 );
 
 router.post ("/posts", postValidateSchema, createPost);
+
+router.delete("/posts", 
+validateUserToken,
+postBelongsUser
+);
 
 export default router;
