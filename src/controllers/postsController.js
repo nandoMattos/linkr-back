@@ -108,3 +108,36 @@ export async function createPost(req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function deletePost(req, res) {
+  const description = res.locals.description;
+  const { postId }= req.body;
+  const hashtagsId = []
+
+  const hashtags = description?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
+  console.log({ hashtags: hashtags});
+
+  try {
+
+    if (hashtags) {
+      console.log("nao entra aqui");
+      for (const hashtag of hashtags) {
+        const { rows } = await postsRepository.subTag(hashtag);
+        hashtagsId.push(rows[0].id);
+      }
+
+      for (const hashtag of hashtagsId) {
+        const { rows } = await postsRepository.removepostXHash(hashtag, postId);
+      }
+    }
+    console.log(hashtagsId)
+
+    await postsRepository.removeLikes(postId);
+    await postsRepository.removePost(postId);
+    res.sendStatus(200);
+  } catch(error) {
+    console.log(error);
+    res.sendStatus(500)
+  }
+
+}

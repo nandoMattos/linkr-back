@@ -32,3 +32,7 @@ export async function deleteSession(user) {
     WHERE
       id_user = $1;`, [user.id]);
 }
+
+export async function findUsersByName(name) {
+  return await connection.query(`SELECT id, username, picture_url FROM users WHERE username LIKE $1 LIMIT 3`, [`%${name}%`]);
+}

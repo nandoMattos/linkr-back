@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { listUser, saveUser, insertSession, deleteSession } from "../repositories/authRepository.js";
+import { listUser, saveUser, insertSession, deleteSession, findUsersByName } from "../repositories/authRepository.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -52,5 +52,17 @@ export async function signIn(req, res) {
 
   } catch (error) {
     res.status(500).send(error.message);
+  }
+}
+
+export async function findUsersLikeName(req, res) {
+  const name = req.query.name;
+  
+  try {
+    const { rows } = await findUsersByName(name);
+    res.send(rows);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
   }
 }
