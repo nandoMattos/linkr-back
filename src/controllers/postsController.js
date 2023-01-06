@@ -3,7 +3,7 @@ import urlMetadata from "url-metadata";
 
 export async function likePost(req, res) {
   try {
-    await postsRepository.insertLike(res.locals.userId, req.params.id);
+    await postsRepository.insertLike(res.locals.id_user, req.params.id);
 
     res.sendStatus(201);
   } catch (err) {
@@ -14,7 +14,7 @@ export async function likePost(req, res) {
 
 export async function deslikePost(req, res) {
   try {
-    await postsRepository.deleteLike(res.locals.userId, req.params.id);
+    await postsRepository.deleteLike(res.locals.id_user, req.params.id);
 
     res.sendStatus(204);
   } catch (err) {
