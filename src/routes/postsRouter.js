@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { createPost, deslikePost, getAllPosts, getAllPostsByUserId, likePost } from "../controllers/postsController.js";
+import { createPost, deletePost, deslikePost, getAllPosts, getAllPostsByUserId, likePost } from "../controllers/postsController.js";
 import {validateUserToken} from "../middlewares/userTokenMiddleware.js"
 
 import {
+  postBelongsUser,
   postExistsValidationMiddleware,
   postValidateSchema,
   userAlreadyLikedPostMiddleware,
@@ -31,5 +32,11 @@ router.delete(
 );
 
 router.post ("/posts", postValidateSchema, createPost);
+
+router.delete("/posts", 
+validateUserToken,
+postBelongsUser,
+deletePost
+);
 
 export default router;
