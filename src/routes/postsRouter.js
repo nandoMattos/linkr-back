@@ -39,4 +39,8 @@ postBelongsUser,
 deletePost
 );
 
+router.put("posts", 
+validateUserToken,
+postBelongsUser)
+
 export default router;
