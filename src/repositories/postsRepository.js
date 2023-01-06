@@ -163,7 +163,17 @@ function postXHash(idHashtag, idPost) {
     VALUES ($1, $2)
     `,
     [idPost, idHashtag]
-  )
+  );
+}
+
+function postXUser(userId, postId) {
+  return connection.query(
+    `
+    SELECT description FROM posts
+    WHERE id = $1 AND id_user = $2
+    `,
+    [postId, userId]
+  );
 }
 
 const postsRepository = {
@@ -178,7 +188,8 @@ const postsRepository = {
   addNewHashtag,
   sumTag,
   addNewPost,
-  postXHash
+  postXHash,
+  postXUser
 };
 
 export default postsRepository;
