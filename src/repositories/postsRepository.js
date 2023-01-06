@@ -2,7 +2,7 @@ import connection from "../database/db.js";
 
 function getAllPosts() {
   return connection.query(`
-    SELECT u.id, u.username, u.picture_url as profilePicture, p.url, p.description,
+    SELECT u.id, p.id as "postId", u.username, u.picture_url as profilePicture, p.url, p.description,
       json_agg(
         DISTINCT h.name
       ) as "hashtags",
@@ -46,10 +46,7 @@ function getAllPostsByUserId(id) {
 function getPostsWithTag(tagId) {
   return connection.query(
     `
-    SELECT u.username, u.picture_url as profilePicture, p.url, p.description,
-    json_agg(
-      DISTINCT h.name
-    ) as "hashtags",
+    SELECT p.id, u.username, u.picture_url as "profilePicture", p.url, p.description,
     json_agg(
       DISTINCT like_user.username
     ) as "likedBy"
