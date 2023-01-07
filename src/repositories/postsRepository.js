@@ -199,7 +199,7 @@ export function removePost(postId) {
     `
     DELETE FROM posts 
     WHERE  id = $1
-    `, 
+    `,
     [postId]
   );
 }
@@ -209,9 +209,19 @@ export function removeLikes(postId) {
     `
     DELETE FROM likes 
     WHERE  id_post = $1
-    `, 
+    `,
     [postId]
   );
+}
+
+export function newDescriptionPost(newDescription, postId) {
+  return connection.query(
+    `
+    UPDATE posts SET description = $1
+    WHERE id = $2
+    `,
+    [newDescription, postId]
+  )
 }
 
 const postsRepository = {
@@ -231,7 +241,8 @@ const postsRepository = {
   subTag,
   removepostXHash,
   removePost,
-  removeLikes
+  removeLikes,
+  newDescriptionPost
 };
 
 export default postsRepository;
