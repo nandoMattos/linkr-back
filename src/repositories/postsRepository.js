@@ -4,9 +4,6 @@ function getAllPosts() {
   return connection.query(`
     SELECT u.id, p.id as "postId", u.username, u.picture_url as profilePicture, p.url, p.description,
       json_agg(
-        DISTINCT h.name
-      ) as "hashtags",
-      json_agg(
         DISTINCT like_user.username
       ) as "likedBy"
     FROM posts p
@@ -23,10 +20,7 @@ function getAllPosts() {
 
 function getAllPostsByUserId(id) {
   return connection.query(`
-    SELECT u.id, u.username, u.picture_url as profilePicture, p.url, p.description,
-      json_agg(
-        DISTINCT h.name
-      ) as "hashtags",
+    SELECT u.id, p.id as "postId", u.username, u.picture_url as profilePicture, p.url, p.description,
       json_agg(
         DISTINCT like_user.username
       ) as "likedBy"
@@ -46,7 +40,7 @@ function getAllPostsByUserId(id) {
 function getPostsWithTag(tagId) {
   return connection.query(
     `
-    SELECT p.id, u.username, u.picture_url as "profilePicture", p.url, p.description,
+    SELECT p.id as "postId", u.username, u.picture_url as profilePicture, p.url, p.description,
     json_agg(
       DISTINCT like_user.username
     ) as "likedBy"
