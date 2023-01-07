@@ -111,11 +111,11 @@ export async function createPost(req, res) {
 
 export async function deletePost(req, res) {
   const description = res.locals.description;
-  const { postId }= req.body;
+  const { postId } = req.params;
   const hashtagsId = []
 
   const hashtags = description?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
-  console.log({ hashtags: hashtags});
+  console.log({ hashtags: hashtags });
 
   try {
 
@@ -135,9 +135,69 @@ export async function deletePost(req, res) {
     await postsRepository.removeLikes(postId);
     await postsRepository.removePost(postId);
     res.sendStatus(200);
-  } catch(error) {
+  } catch (error) {
     console.log(error);
     res.sendStatus(500)
   }
 
+}
+
+export async function updatePost(req, res) {
+  const description = res.locals.description;
+  const { postId } = req.params;
+  const hashtagsId = [];
+  const hashtagsIdNewDes = []
+  const newDescription = req.body.description;
+
+  const hashtags = description?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
+  const newDescHash = newDescription?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
+  console.log({ hashtags, newDescHash });
+
+  try {
+
+    if (hashtags) {
+      console.log("nao entra aqui");
+      for (const hashtag of hashtags) {
+        const { rows } = await postsRepository.subTag(hashtag);
+        hashtagsId.push(rows[0].id);
+      }
+
+      for (const hashtag of hashtagsId) await postsRepository.removepostXHash(hashtag, postId);
+
+    }
+
+    if (newDescHash) {
+      const newHashtags = [];
+      const sumHashtag = [];
+      for (const hashtag of newDescHash) {
+        const { rows } = await postsRepository.searchHashtag(hashtag);
+        if (rows[0]?.name) sumHashtag.push(rows[0].name);
+        if (!rows[0]?.name) newHashtags.push(hashtag);
+      }
+
+      for (const hashtag of newHashtags) {
+        const { rows } = await postsRepository.addNewHashtag(hashtag);
+        hashtagsIdNewDes.push(rows[0].id);
+      }
+
+      for (const hashtag of sumHashtag) {
+        const { rows } = await postsRepository.sumTag(hashtag);
+        hashtagsIdNewDes.push(rows[0].id);
+      }
+      console.log(newHashtags);
+      console.log(sumHashtag);
+
+      for (const hashtag of hashtagsIdNewDes) await postsRepository.postXHash(hashtag, postId);
+      
+    }
+    console.log(hashtagsId);
+    console.log(hashtagsIdNewDes);
+
+    await postsRepository.newDescriptionPost(newDescription, postId)
+    
+    res.sendStatus(201);
+  } catch (error) {
+    console.log(error)
+    res.sendStatus(500);
+  }
 }
