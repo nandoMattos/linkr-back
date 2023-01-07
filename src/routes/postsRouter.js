@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createPost, deletePost, deslikePost, getAllPosts, getAllPostsByUserId, likePost } from "../controllers/postsController.js";
+import { createPost, deletePost, deslikePost, getAllPosts, getAllPostsByUserId, likePost, updatePost } from "../controllers/postsController.js";
 import {validateUserToken} from "../middlewares/userTokenMiddleware.js"
 
 import {
@@ -33,10 +33,15 @@ router.delete(
 
 router.post ("/posts", postValidateSchema, createPost);
 
-router.delete("/posts", 
+router.delete("/posts/:postId", 
 validateUserToken,
 postBelongsUser,
 deletePost
 );
+
+router.put("/posts/:postId", 
+validateUserToken,
+postBelongsUser,
+updatePost)
 
 export default router;
