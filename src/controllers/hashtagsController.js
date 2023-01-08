@@ -4,7 +4,13 @@ import urlMetadata from "url-metadata"
 
 export async function getTrendings(req, res) {
   try {
-    res.send((await hashtagsRepository.getTrendings()).rows);
+    const tags = await hashtagsRepository.getTrendings();
+
+    res.send(
+      tags.rows.map((t) => {
+        return { id: t.id, name: t.name };
+      })
+    );
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
