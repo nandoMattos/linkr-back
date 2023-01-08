@@ -14,6 +14,6 @@ router.get(
   validateUserToken,
   tagExistsValidationMiddleware,
   getPostsWithTag
-);
+);  
 
 export default router;
