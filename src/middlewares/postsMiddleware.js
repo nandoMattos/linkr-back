@@ -59,7 +59,6 @@ export async function postValidateSchema (req, res, next) {
 export async function postBelongsUser(req, res, next) {
   const userId = res.locals.id_user;
   const postId  = Number(req.params.postId);
-  console.log([userId, postId]);
 
   if (!postId) return res.sendStatus(404);
 

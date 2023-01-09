@@ -3,9 +3,12 @@ import connection from "../database/db.js";
 function getTrendings() {
   return connection.query(
     `
-    SELECT id, name
-    FROM hashtags
-    ORDER BY posts_amount DESC
+    SELECT h.id as "hashtagId", h.name as "hashtagName", COUNT(h.id) as "postAmount"
+    FROM posts p
+      JOIN post_hashtag ph ON p.id = ph.id_post
+      JOIN hashtags h ON h.id = ph.id_hashtag
+    GROUP BY h.name, h.id
+    ORDER BY "postAmount" DESC, "hashtagName"
     LIMIT 10;
   `
   );
