@@ -31,7 +31,7 @@ router.delete(
   deslikePost
 );
 
-router.post ("/posts", postValidateSchema, createPost);
+router.post ("/posts", validateUserToken, postValidateSchema, createPost);
 
 router.delete("/posts/:postId", 
 validateUserToken,

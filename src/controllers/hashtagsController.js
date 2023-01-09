@@ -8,7 +8,7 @@ export async function getTrendings(req, res) {
 
     res.send(
       tags.rows.map((t) => {
-        return { id: t.id, name: t.name };
+        return { id: t.hashtagId, name: t.hashtagName };
       })
     );
   } catch (err) {

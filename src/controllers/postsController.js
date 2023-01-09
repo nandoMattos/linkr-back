@@ -63,22 +63,20 @@ export async function getAllPostsByUserId(req, res) {
 }
 
 export async function createPost(req, res) {
-  //const {username, userId} = res.locals.user;
-  const userId = 3;
+  const userId = res.locals.id_user;
   const { url, description } = req.body;
 
   const hashtags = description?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
-  console.log(hashtags);
 
   try {
     const hashtagsId = [];
     if (hashtags) {
       const newHashtags = [];
-      const sumHashtag = [];
-      //const hashExist = hashtags?.map(async (hashtag) => await postsRepository.searchHashtag(hashtag));
+      const existentHashtag = [];
+
       for (const hashtag of hashtags) {
         const { rows } = await postsRepository.searchHashtag(hashtag);
-        if (rows[0]?.name) sumHashtag.push(rows[0].name);
+        if (rows[0]?.name) existentHashtag.push(rows[0].name);
         if (!rows[0]?.name) newHashtags.push(hashtag);
       }
 
@@ -87,14 +85,12 @@ export async function createPost(req, res) {
         hashtagsId.push(rows[0].id);
       }
 
-      for (const hashtag of sumHashtag) {
-        const { rows } = await postsRepository.sumTag(hashtag);
+      for (const hashtag of existentHashtag) {
+        const { rows } = await postsRepository.getTagId(hashtag);
         hashtagsId.push(rows[0].id);
       }
-      console.log(newHashtags);
-      console.log(sumHashtag);
     }
-    console.log(hashtagsId)
+  
     const { rows } = await postsRepository.addNewPost(userId, url, description);
     const idPost = rows[0].id;
 
@@ -115,14 +111,11 @@ export async function deletePost(req, res) {
   const hashtagsId = []
 
   const hashtags = description?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
-  console.log({ hashtags: hashtags });
 
   try {
-
     if (hashtags) {
-      console.log("nao entra aqui");
       for (const hashtag of hashtags) {
-        const { rows } = await postsRepository.subTag(hashtag);
+        const { rows } = await postsRepository.getTagId(hashtag);
         hashtagsId.push(rows[0].id);
       }
 
@@ -130,7 +123,6 @@ export async function deletePost(req, res) {
         const { rows } = await postsRepository.removepostXHash(hashtag, postId);
       }
     }
-    console.log(hashtagsId)
 
     await postsRepository.removeLikes(postId);
     await postsRepository.removePost(postId);
@@ -151,14 +143,11 @@ export async function updatePost(req, res) {
 
   const hashtags = description?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
   const newDescHash = newDescription?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
-  console.log({ hashtags, newDescHash });
 
   try {
-
     if (hashtags) {
-      console.log("nao entra aqui");
       for (const hashtag of hashtags) {
-        const { rows } = await postsRepository.subTag(hashtag);
+        const { rows } = await postsRepository.getTagId(hashtag);
         hashtagsId.push(rows[0].id);
       }
 
@@ -181,17 +170,13 @@ export async function updatePost(req, res) {
       }
 
       for (const hashtag of sumHashtag) {
-        const { rows } = await postsRepository.sumTag(hashtag);
+        const { rows } = await postsRepository.getTagId(hashtag);
         hashtagsIdNewDes.push(rows[0].id);
       }
-      console.log(newHashtags);
-      console.log(sumHashtag);
 
       for (const hashtag of hashtagsIdNewDes) await postsRepository.postXHash(hashtag, postId);
       
     }
-    console.log(hashtagsId);
-    console.log(hashtagsIdNewDes);
 
     await postsRepository.newDescriptionPost(newDescription, postId)
     

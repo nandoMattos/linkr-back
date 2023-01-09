@@ -125,12 +125,12 @@ function addNewHashtag(hashtag) {
   );
 }
 
-function sumTag(hashtag) {
+function getTagId(hashtag) {
   return connection.query(
     `
-    UPDATE hashtags SET posts_amount = posts_amount + 1
-    WHERE name = $1
-    RETURNING id
+    SELECT id
+    FROM hashtags
+    WHERE name = $1;
     `,
     [hashtag]
   );
@@ -164,17 +164,6 @@ function postXUser(userId, postId) {
     WHERE id = $1 AND id_user = $2
     `,
     [postId, userId]
-  );
-}
-
-function subTag(hashtag) {
-  return connection.query(
-    `
-    UPDATE hashtags SET posts_amount = posts_amount - 1
-    WHERE name = $1
-    RETURNING id
-    `,
-    [hashtag]
   );
 }
 
@@ -228,11 +217,10 @@ const postsRepository = {
   getAllPosts,
   searchHashtag,
   addNewHashtag,
-  sumTag,
+  getTagId,
   addNewPost,
   postXHash,
   postXUser,
-  subTag,
   removepostXHash,
   removePost,
   removeLikes,
