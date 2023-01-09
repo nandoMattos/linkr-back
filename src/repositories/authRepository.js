@@ -10,6 +10,16 @@ export async function listUser(email) {
       email = $1;`, [email]);
 }
 
+export async function listUserName(username) {
+  return await connection.query(`
+    SELECT
+      *
+    FROM
+      users
+    WHERE
+      username = $1;`, [username]);
+}
+
 export async function saveUser(username, email, passwordHash, picture_url) {
   return await connection.query(`
   INSERT INTO

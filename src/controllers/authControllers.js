@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { listUser, saveUser, insertSession, deleteSession, findUsersByName } from "../repositories/authRepository.js";
+import { listUser, saveUser, insertSession, deleteSession, findUsersByName, listUserName } from "../repositories/authRepository.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -11,8 +11,9 @@ export async function signUp(req, res) {
     new URL(picture_url);
 
     const user = await listUser(email);
+    const userName = await listUserName(username);
 
-    if (user.rowCount > 0) {
+    if (user.rowCount > 0 || userName.rowCount > 0) {
       return res.sendStatus(409);
     }
 
