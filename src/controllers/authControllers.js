@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { listUser, saveUser, insertSession, deleteSession, findUsersByName, listUserName } from "../repositories/authRepository.js";
+import { listUser, saveUser, insertSession, deleteSession, findUsersByName, listUserName, insertFollow, deleteFollow, verifyFollowUser } from "../repositories/authRepository.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -66,4 +66,43 @@ export async function findUsersLikeName(req, res) {
     console.log(err);
     res.sendStatus(500);
   }
+}
+
+export async function verifyUserFollows(req, res) {
+  const { id_user_follower, id_user_followed } = req.body;
+
+  try {
+    const follow = await verifyFollowUser(id_user_follower, id_user_followed);
+
+    if(follow.rowCount === 0) {
+      return res.status(200).send({"follow": false});
+    }
+    
+    return res.status(200).send({"follow": true});
+
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  } 
+}
+
+
+export async function followUser(req, res) {
+  const { id_user_follower, id_user_followed } = req.body;
+
+  try {
+    const follow = await verifyFollowUser(id_user_follower, id_user_followed);
+
+    if(follow.rowCount === 0) {
+      await insertFollow(id_user_follower, id_user_followed);
+      return res.status(200).send({"follow": true});
+    }
+    
+    await deleteFollow(id_user_follower, id_user_followed);
+    return res.status(200).send({"follow": false});
+
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  } 
 }
