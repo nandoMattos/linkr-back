@@ -1,5 +1,6 @@
 import postsRepository from "../repositories/postsRepository.js";
 import urlMetadata from "url-metadata";
+import { getAllFollowing } from "../repositories/authRepository.js";
 
 export async function likePost(req, res) {
   try {
@@ -24,17 +25,32 @@ export async function deslikePost(req, res) {
 }
 
 export async function getAllPosts(req, res) {
+  const idUser = res.locals.id_user;
+  
   try {
-    const { rows } = await postsRepository.getAllPosts();
+    const follows = await getAllFollowing(idUser);
 
-    for (const post of rows) {
-      const metadata = await urlMetadata(post.url);
-      post.title = metadata.title;
-      post.image = metadata.image;
-      post.linkDescription = metadata.description;
+    const listFolloweds = [];
+    for(const f of follows.rows) {
+      listFolloweds.push(f.id_user_followed)
     }
 
-    res.send(rows);
+    const { rows } = await postsRepository.getAllPosts();
+
+    const postsByFolloweds = [];
+
+    for (let post of rows) {
+      if(listFolloweds.includes(post.id)) {
+        const metadata = await urlMetadata(post.url);
+        post.title = metadata.title;
+        post.image = metadata.image;
+        post.linkDescription = metadata.description;
+
+        postsByFolloweds.push(post);
+      } 
+    }
+
+    res.send(postsByFolloweds);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
