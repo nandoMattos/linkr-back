@@ -1,6 +1,6 @@
 import postsRepository from "../repositories/postsRepository.js";
 import urlMetadata from "url-metadata";
-import { getAllFollowing } from "../repositories/authRepository.js";
+import { getAllFollowing, listUserById } from "../repositories/authRepository.js";
 
 export async function likePost(req, res) {
   try {
@@ -63,6 +63,8 @@ export async function getAllPostsByUserId(req, res) {
 
   try {
     const { rows } = await postsRepository.getAllPostsByUserId(id);
+    const { rows : user } = await listUserById(id);
+
 
     for (const post of rows) {
       const metadata = await urlMetadata(post.url);
@@ -71,7 +73,7 @@ export async function getAllPostsByUserId(req, res) {
       post.linkDescription = metadata.description;
     }
 
-    res.send(rows);
+    res.send({posts: rows, username: user[0].username});
   } catch (err) {
     console.log(err);
     res.sendStatus(500);

@@ -60,10 +60,30 @@ export async function signIn(req, res) {
 
 export async function findUsersLikeName(req, res) {
   const name = req.query.name;
+  const idUser = res.locals.id_user;
   
   try {
+    const follows = await getAllFollowing(idUser);
+
+    const listFollowig = [];
+    for(const f of follows.rows) {
+      listFollowig.push(f.id_user_followed)
+    }
+
     const { rows } = await findUsersByName(name);
-    res.send(rows);
+    const usersFollowing = [];
+    const notFollowingUsers = [];
+
+    for (let user of rows) {
+      if(listFollowig.includes(user.id)) {
+        user.follows = true;
+        usersFollowing.push(user);
+      } else {
+        notFollowingUsers.push(user);
+      }
+    }
+    
+    res.send([...usersFollowing, ...notFollowingUsers]);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
