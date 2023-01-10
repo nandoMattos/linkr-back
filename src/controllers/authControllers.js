@@ -1,6 +1,8 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { listUser, saveUser, insertSession, deleteSession, findUsersByName, listUserName, insertFollow, deleteFollow, verifyFollowUser } from "../repositories/authRepository.js";
+import { listUser, saveUser, insertSession, 
+  deleteSession, findUsersByName, listUserName, 
+  insertFollow, deleteFollow, verifyFollowUser, getAllFollowing } from "../repositories/authRepository.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -86,9 +88,10 @@ export async function verifyUserFollows(req, res) {
   } 
 }
 
-
 export async function followUser(req, res) {
   const { id_user_follower, id_user_followed } = req.body;
+
+  if(id_user_follower === id_user_followed) return res.sendStatus(400);
 
   try {
     const follow = await verifyFollowUser(id_user_follower, id_user_followed);
@@ -105,4 +108,17 @@ export async function followUser(req, res) {
     console.log(err);
     res.sendStatus(500);
   } 
+}
+
+export async function findAllFollowing(req, res) {
+  const idUser = res.locals.id_user;
+
+  try {
+    const { rows } = await getAllFollowing(idUser);
+
+    return res.send(rows).status(200);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
 }

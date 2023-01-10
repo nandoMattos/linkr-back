@@ -47,6 +47,10 @@ export async function findUsersByName(name) {
   return await connection.query(`SELECT id, username, picture_url FROM users WHERE username LIKE $1 LIMIT 3`, [`%${name}%`]);
 }
 
+export async function getAllFollowing(id_follower) {
+  return await connection.query(`SELECT * FROM follows WHERE id_user_follower = $1`, [id_follower]);
+}
+
 export async function verifyFollowUser(id_follower, id_followed) {
   return await connection.query(`SELECT * FROM follows WHERE id_user_follower = $1 AND id_user_followed = $2`, [id_follower, id_followed])
 }
