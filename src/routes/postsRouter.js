@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { createPost, deletePost, deslikePost, getAllPosts, getAllPostsByUserId, likePost, updatePost } from "../controllers/postsController.js";
+import { commentPost, createPost, deletePost, deslikePost, getAllPosts, getAllPostsByUserId, likePost, updatePost } from "../controllers/postsController.js";
 import {validateUserToken} from "../middlewares/userTokenMiddleware.js"
 
 import {
+  commentBodyMiddleware,
   postBelongsUser,
   postExistsValidationMiddleware,
   postValidateSchema,
@@ -43,5 +44,12 @@ router.put("/posts/:postId",
 validateUserToken,
 postBelongsUser,
 updatePost)
+
+router.post("/posts/:id/comments", 
+  validateUserToken, 
+  commentBodyMiddleware,
+  postExistsValidationMiddleware,
+  commentPost
+)
 
 export default router;

@@ -202,3 +202,17 @@ export async function updatePost(req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function commentPost (req, res) {
+  try{
+    await postsRepository.insertComment(
+      res.locals.id_user, 
+      req.params.id,
+      req.body.comment
+    )
+    res.sendStatus(201);
+  } catch(err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+}

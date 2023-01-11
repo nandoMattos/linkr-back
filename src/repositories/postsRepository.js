@@ -2,58 +2,91 @@ import connection from "../database/db.js";
 
 function getAllPosts() {
   return connection.query(`
-    SELECT u.id, p.id as "postId", u.username, u.picture_url as profilePicture, p.url, p.description,
+  SELECT u.id, p.id as "postId", u.username, u.picture_url as profilePicture, p.url, p.description,
       json_agg(
         DISTINCT like_user.username
-      ) as "likedBy"
+      ) as "likedBy",
+      json_agg( DISTINCT
+        jsonb_build_object(
+            'id', c.id,
+            'comment', c.comment,
+            'profile_picture', comment_user.picture_url,
+            'username', comment_user.username
+         )
+      ) as "comments"
     FROM posts p
       JOIN users u ON p.id_user = u.id
       LEFT JOIN post_hashtag ph ON p.id = ph.id_post 
       LEFT JOIN hashtags h ON h.id = ph.id_hashtag
       LEFT JOIN likes l ON l.id_post = p.id
       LEFT JOIN users like_user ON like_user.id = l.id_user
+      LEFT JOIN comments c ON c.id_post = p.id
+      LEFT JOIN users comment_user ON comment_user.id = c.id_user
     GROUP BY p.id, u.id
     ORDER BY p.created_at DESC
-    LIMIT 20;
+    LIMIT 10;
   `);
 }
 
 function getAllPostsByUserId(id) {
-  return connection.query(`
+  return connection.query(
+    `
     SELECT u.id, p.id as "postId", u.username, u.picture_url as profilePicture, p.url, p.description,
       json_agg(
         DISTINCT like_user.username
-      ) as "likedBy"
+      ) as "likedBy",
+      json_agg( DISTINCT
+        jsonb_build_object(
+          'id', c.id,
+          'comment', c.comment,
+          'profile_picture', comment_user.picture_url,
+          'username', comment_user.username
+        )
+      ) as "comments"
     FROM posts p
       JOIN users u ON p.id_user = u.id
       LEFT JOIN post_hashtag ph ON p.id = ph.id_post 
       LEFT JOIN hashtags h ON h.id = ph.id_hashtag
       LEFT JOIN likes l ON l.id_post = p.id
       LEFT JOIN users like_user ON like_user.id = l.id_user
-    WHERE u.id = $1
+      LEFT JOIN comments c ON c.id_post = p.id
+      LEFT JOIN users comment_user ON comment_user.id = c.id_user
+      WHERE u.id = $1
     GROUP BY p.id, u.id
     ORDER BY p.created_at DESC
-    LIMIT 20;
-  `, [id]);
+    LIMIT 10;
+  `,
+    [id]
+  );
 }
 
 function getPostsWithTag(tagId) {
   return connection.query(
     `
-    SELECT p.id as "postId", u.username, u.picture_url as profilePicture, p.url, p.description,
-    json_agg(
-      DISTINCT like_user.username
-    ) as "likedBy"
+    SELECT u.id, p.id as "postId", u.username, u.picture_url as profilePicture, p.url, p.description,
+      json_agg(
+        DISTINCT like_user.username
+      ) as "likedBy",
+      json_agg( DISTINCT
+        jsonb_build_object(
+          'id', c.id,
+          'comment', c.comment,
+          'profile_picture', comment_user.picture_url,
+          'username', comment_user.username
+        )
+      ) as "comments"
     FROM posts p
       JOIN users u ON p.id_user = u.id
       LEFT JOIN post_hashtag ph ON p.id = ph.id_post 
       LEFT JOIN hashtags h ON h.id = ph.id_hashtag
       LEFT JOIN likes l ON l.id_post = p.id
       LEFT JOIN users like_user ON like_user.id = l.id_user
-    WHERE h.id = $1
+      LEFT JOIN comments c ON c.id_post = p.id
+      LEFT JOIN users comment_user ON comment_user.id = c.id_user
+      WHERE h.id = $1
     GROUP BY p.id, u.id
     ORDER BY p.created_at DESC
-    LIMIT 20;
+    LIMIT 10;
   `,
     [tagId]
   );
@@ -204,7 +237,19 @@ export function newDescriptionPost(newDescription, postId) {
     WHERE id = $2
     `,
     [newDescription, postId]
-  )
+  );
+}
+
+export function insertComment(userId, postId, comment) {
+  return connection.query(
+    `
+    INSERT INTO comments
+    (id_user, id_post, comment) 
+    VALUES
+    ($1, $2, $3);
+  `,
+    [userId, postId, comment]
+  );
 }
 
 const postsRepository = {
@@ -224,7 +269,8 @@ const postsRepository = {
   removepostXHash,
   removePost,
   removeLikes,
-  newDescriptionPost
+  newDescriptionPost,
+  insertComment
 };
 
 export default postsRepository;
