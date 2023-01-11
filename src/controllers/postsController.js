@@ -35,7 +35,7 @@ export async function getAllPosts(req, res) {
       listFolloweds.push(f.id_user_followed)
     }
 
-    const { rows } = await postsRepository.getAllPosts();
+    const { rows } = await postsRepository.getReposts();
 
     const postsByFolloweds = [];
 
@@ -215,6 +215,19 @@ export async function commentPost (req, res) {
     res.sendStatus(201);
   } catch(err) {
     console.log(err);
+    res.sendStatus(500);
+  }
+}
+
+export async function repost (req, res) {
+  const userId = res.locals.id_user;
+  const postId = req.params;
+
+  try {
+    await postsRepository.respostBy(userId, postId)
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
     res.sendStatus(500);
   }
 }
