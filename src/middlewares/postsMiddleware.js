@@ -1,4 +1,5 @@
 import postsRepository from "../repositories/postsRepository.js";
+import commentSchema from "../schemas/commentSchema.js";
 import publishSchema from "../schemas/publishSchema.js";
 
 export async function postExistsValidationMiddleware(req, res, next) {
@@ -78,5 +79,19 @@ export async function postBelongsUser(req, res, next) {
   }
 
 
+
+}
+
+export async function commentBodyMiddleware (req, res, next) {
+  const post = req.body;
+
+  const { error } = commentSchema.validate(post, {abortEarly: false});
+
+  if (error) {
+    const errors = error.details.map( (detail) => detail.message);
+    return res.status(400).send( {message: errors});
+  }
+
+  next();
 
 }
