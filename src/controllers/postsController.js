@@ -30,12 +30,13 @@ export async function getAllPosts(req, res) {
   try {
     const follows = await getAllFollowing(idUser);
 
-    const listFolloweds = [];
+    const listFolloweds = [idUser];
     for(const f of follows.rows) {
       listFolloweds.push(f.id_user_followed)
     }
 
     const { rows } = await postsRepository.getAllPosts();
+    const { rows: reposts } = await postsRepository.getReportsbyUserId(idUser);
 
     const postsByFolloweds = [];
 
@@ -49,7 +50,7 @@ export async function getAllPosts(req, res) {
         postsByFolloweds.push(post);
       } 
     }
-
+    console.log(postsByFolloweds)
     res.send(postsByFolloweds);
   } catch (err) {
     console.log(err);
