@@ -26,6 +26,8 @@ export async function deslikePost(req, res) {
 
 export async function getAllPosts(req, res) {
   const idUser = res.locals.id_user;
+  const { offset } = req.query;
+  const { noLimit } = req.query;
   
   try {
     const follows = await getAllFollowing(idUser);
@@ -35,7 +37,7 @@ export async function getAllPosts(req, res) {
       listFolloweds.push(f.id_user_followed)
     }
 
-    const { rows } = await postsRepository.getAllPosts();
+    const { rows } = await postsRepository.getAllPosts({ offset, noLimit });
 
     const postsByFolloweds = [];
 
