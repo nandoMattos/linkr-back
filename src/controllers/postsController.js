@@ -221,7 +221,8 @@ export async function commentPost (req, res) {
 
 export async function repost (req, res) {
   const userId = res.locals.id_user;
-  const postId = req.params;
+  const { postId } = req.params;
+  console.log(userId)
 
   try {
     await postsRepository.respostBy(userId, postId)

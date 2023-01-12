@@ -291,7 +291,7 @@ export function insertComment(userId, postId, comment) {
 export function respostBy(userId, postId) {
   return connection.query(
     `
-    INSERT INTO reposts (id_user, is_post)
+    INSERT INTO reposts (id_user, id_post)
     VALUES
     ($1, $2)
   `,
