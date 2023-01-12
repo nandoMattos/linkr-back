@@ -1,6 +1,6 @@
 import connection from "../database/db.js";
 
-function getAllPosts() {
+function getAllPosts({ offset, noLimit }) {
   return connection.query(`
   SELECT u.id, p.id as "postId", u.username, u.picture_url as profilePicture, p.url, p.description,
       json_agg(
@@ -24,8 +24,9 @@ function getAllPosts() {
       LEFT JOIN users comment_user ON comment_user.id = c.id_user
     GROUP BY p.id, u.id
     ORDER BY p.created_at DESC
-    LIMIT 10;
-  `);
+    ${noLimit ? "" : "LIMIT 10"}
+    OFFSET $1;
+  `, [offset]);
 }
 
 function getAllPostsByUserId(id) {
