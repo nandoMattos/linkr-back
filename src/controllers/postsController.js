@@ -218,3 +218,17 @@ export async function commentPost (req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function repost (req, res) {
+  const userId = res.locals.id_user;
+  const { postId } = req.params;
+  console.log(userId)
+
+  try {
+    await postsRepository.respostBy(userId, postId)
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
