@@ -43,7 +43,8 @@ function getAllPostsByUserId(id) {
           'profile_picture', comment_user.picture_url,
           'username', comment_user.username
         )
-      ) as "comments"
+      ) as "comments", 
+      COUNT (DISTINCT rp.id) as "repost_count"
     FROM posts p
       JOIN users u ON p.id_user = u.id
       LEFT JOIN post_hashtag ph ON p.id = ph.id_post 
@@ -52,6 +53,7 @@ function getAllPostsByUserId(id) {
       LEFT JOIN users like_user ON like_user.id = l.id_user
       LEFT JOIN comments c ON c.id_post = p.id
       LEFT JOIN users comment_user ON comment_user.id = c.id_user
+      LEFT JOIN reposts rp ON rp.id_post = p.id
       WHERE u.id = $1
     GROUP BY p.id, u.id
     ORDER BY p.created_at DESC
@@ -253,6 +255,17 @@ export function insertComment(userId, postId, comment) {
   );
 }
 
+export function respostBy(userId, postId) {
+  return connection.query(
+    `
+    INSERT INTO reposts (id_user, id_post)
+    VALUES
+    ($1, $2)
+  `,
+    [userId, postId]
+  );
+}
+
 const postsRepository = {
   getPostsWithTag,
   getPostById,
@@ -271,7 +284,8 @@ const postsRepository = {
   removePost,
   removeLikes,
   newDescriptionPost,
-  insertComment
+  insertComment,
+  respostBy
 };
 
 export default postsRepository;
