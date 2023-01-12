@@ -35,7 +35,7 @@ export async function getAllPosts(req, res) {
       listFolloweds.push(f.id_user_followed)
     }
 
-    const { rows } = await postsRepository.getReposts();
+    const { rows } = await postsRepository.getAllPosts();
 
     const postsByFolloweds = [];
 
