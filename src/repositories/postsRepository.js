@@ -1,6 +1,6 @@
 import connection from "../database/db.js";
 
-function getAllPosts() {
+function getAllPosts({ offset, noLimit }) {
   return connection.query(`
   SELECT u.id, p.id as "postId", u.username, u.picture_url as profilePicture, p.url, p.description,
       json_agg(
@@ -24,7 +24,9 @@ function getAllPosts() {
       LEFT JOIN users comment_user ON comment_user.id = c.id_user
     GROUP BY p.id, u.id
     ORDER BY p.created_at DESC
-  `);
+    ${noLimit ? "" : "LIMIT 10"}
+    OFFSET $1;
+  `, [offset]);
 }
 
 function getAllPostsByUserId(id) {
@@ -61,16 +63,17 @@ function getAllPostsByUserId(id) {
   );
 }
 
-function getReportsbyUserId(id) {
+function getReposts() {
   return connection.query(
     `
-    SELECT rp.id_user as "repostBy", p.id_user, p.id as "postId", u.username, u.picture_url as profilePicture, p.url, p.description,
+    SELECT  p.id_user as "id", p.id as "postId", user_post.username, u.picture_url as profilePicture, p.url, p.description,
       json_agg(
         DISTINCT like_user.username
       ) as "likedBy",
       json_agg( DISTINCT
         jsonb_build_object(
           'id', c.id,
+          'userId', comment_user.id,
           'comment', c.comment,
           'profile_picture', comment_user.picture_url,
           'username', comment_user.username
@@ -81,23 +84,21 @@ function getReportsbyUserId(id) {
           'id', u.id,
           'username', u.username
         )
-      ) as "user", 
-      COUNT (DISTINCT rp.id) as "repost_count"
+      ) as "user"
     FROM reposts rp
       LEFT JOIN users u ON rp.id_user = u.id
-      LEFT JOIN posts p ON p.id = rp.id_post 
+      LEFT JOIN posts p ON p.id = rp.id_post
+      LEFT JOIN users user_post ON user_post.id = p.id_user 
       LEFT JOIN post_hashtag ph ON p.id = ph.id_post 
       LEFT JOIN hashtags h ON h.id = ph.id_hashtag
       LEFT JOIN likes l ON l.id_post = p.id
       LEFT JOIN users like_user ON like_user.id = l.id_user
       LEFT JOIN comments c ON c.id_post = p.id
       LEFT JOIN users comment_user ON comment_user.id = c.id_user
-      WHERE u.id = $1
-    GROUP BY p.id, u.id, rp.id
+    GROUP BY p.id, u.id, rp.id, user_post.username
     ORDER BY p.created_at DESC
   LIMIT 10;
-  `, [id]
-  )
+  `);
 }
 
 function getPostsWithTag(tagId) {
@@ -323,7 +324,7 @@ const postsRepository = {
   newDescriptionPost,
   insertComment,
   respostBy,
-  getReportsbyUserId
+  getReposts
 };
 
 export default postsRepository;

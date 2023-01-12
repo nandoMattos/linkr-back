@@ -26,29 +26,34 @@ export async function deslikePost(req, res) {
 
 export async function getAllPosts(req, res) {
   const idUser = res.locals.id_user;
-  
+  const { offset } = req.query;
+  const { noLimit } = req.query;
+
   try {
     const follows = await getAllFollowing(idUser);
 
     const listFolloweds = [idUser];
-    for(const f of follows.rows) {
+    for (const f of follows.rows) {
       listFolloweds.push(f.id_user_followed)
     }
 
-    const { rows } = await postsRepository.getAllPosts();
-    const { rows: reposts } = await postsRepository.getReportsbyUserId(idUser);
+    const { rows } = await postsRepository.getAllPosts({ offset, noLimit });
+    const { rows: reposts } = await postsRepository.getReposts();
+    console.log(reposts)
 
     const postsByFolloweds = [];
 
     for (let post of rows) {
-      if(listFolloweds.includes(post.id)) {
+      if (listFolloweds.includes(post.id)) {
         const metadata = await urlMetadata(post.url);
         post.title = metadata.title;
         post.image = metadata.image;
         post.linkDescription = metadata.description;
 
         postsByFolloweds.push(post);
-      } 
+      }
+      
+
     }
     console.log(postsByFolloweds)
     res.send(postsByFolloweds);
@@ -64,7 +69,7 @@ export async function getAllPostsByUserId(req, res) {
 
   try {
     const { rows } = await postsRepository.getAllPostsByUserId(id);
-    const { rows : user } = await listUserById(id);
+    const { rows: user } = await listUserById(id);
 
 
     for (const post of rows) {
@@ -74,7 +79,7 @@ export async function getAllPostsByUserId(req, res) {
       post.linkDescription = metadata.description;
     }
 
-    res.send({posts: rows, username: user[0].username});
+    res.send({ posts: rows, username: user[0].username });
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
@@ -109,7 +114,7 @@ export async function createPost(req, res) {
         hashtagsId.push(rows[0].id);
       }
     }
-  
+
     const { rows } = await postsRepository.addNewPost(userId, url, description);
     const idPost = rows[0].id;
 
@@ -194,11 +199,11 @@ export async function updatePost(req, res) {
       }
 
       for (const hashtag of hashtagsIdNewDes) await postsRepository.postXHash(hashtag, postId);
-      
+
     }
 
     await postsRepository.newDescriptionPost(newDescription, postId)
-    
+
     res.sendStatus(201);
   } catch (error) {
     console.log(error)
@@ -206,21 +211,21 @@ export async function updatePost(req, res) {
   }
 }
 
-export async function commentPost (req, res) {
-  try{
+export async function commentPost(req, res) {
+  try {
     await postsRepository.insertComment(
-      res.locals.id_user, 
+      res.locals.id_user,
       req.params.id,
       req.body.comment
     )
     res.sendStatus(201);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.sendStatus(500);
   }
 }
 
-export async function repost (req, res) {
+export async function repost(req, res) {
   const userId = res.locals.id_user;
   const { postId } = req.params;
   console.log(userId)
