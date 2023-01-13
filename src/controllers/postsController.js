@@ -112,7 +112,12 @@ export async function createPost(req, res) {
   const userId = res.locals.id_user;
   const { url, description } = req.body;
 
-  const hashtags = description?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
+  const untreatedHashtags = description?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
+  const treatement = new Set();
+  untreatedHashtags?.forEach((hashtag) => {
+    treatement.add(hashtag)
+  })
+  const hashtags = [...treatement.values()]
 
   try {
     const hashtagsId = [];
@@ -156,7 +161,13 @@ export async function deletePost(req, res) {
   const { postId } = req.params;
   const hashtagsId = []
 
-  const hashtags = description?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
+  const untreatedHashtags = description?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
+  const treatement = new Set();
+  untreatedHashtags?.forEach((hashtag) => {
+    treatement.add(hashtag)
+  })
+  const hashtags = [...treatement.values()]
+  console.log(hashtags)
 
   try {
     if (hashtags) {
@@ -187,8 +198,23 @@ export async function updatePost(req, res) {
   const hashtagsIdNewDes = []
   const newDescription = req.body.description;
 
-  const hashtags = description?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
-  const newDescHash = newDescription?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
+  const untreatedHashtags = description?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
+  const treatement = new Set();
+  untreatedHashtags?.forEach((hashtag) => {
+    treatement.add(hashtag)
+  })
+  const hashtags = [...treatement.values()]
+
+  const untreatedNewDescHash = newDescription?.trim().match(/(#[A-Za-z0-9]*)/g)?.map(el => el.replace('#', ""));
+  const treatementNew = new Set();
+  untreatedNewDescHash?.forEach((hashtag) => {
+    treatementNew.add(hashtag)
+  })
+  const newDescHash = [...treatementNew.values()]
+
+  console.log("old:", hashtags);
+  console.log("new:", newDescHash )
+
 
   try {
     if (hashtags) {
