@@ -1,6 +1,6 @@
 import connection from "../database/db.js";
 
-function getAllPosts({ offset, noLimit }) {
+function getAllPosts() {
   return connection.query(`
   SELECT u.id, p.id as "postId", u.username, u.picture_url as profilePicture, p.url, p.description,
       json_agg(
@@ -24,9 +24,7 @@ function getAllPosts({ offset, noLimit }) {
       LEFT JOIN users comment_user ON comment_user.id = c.id_user
     GROUP BY p.id, u.id
     ORDER BY p.created_at DESC
-    ${noLimit ? "" : "LIMIT 10"}
-    OFFSET $1;
-  `, [offset]);
+    `);
 }
 
 function getAllPostsByUserId(id) {
@@ -66,7 +64,7 @@ function getAllPostsByUserId(id) {
 function getReposts() {
   return connection.query(
     `
-    SELECT  p.id_user as "id", p.id as "postId", user_post.username, u.picture_url as profilePicture, p.url, p.description,
+    SELECT  p.id_user as "id", p.id as "postId", user_post.username, user_post.picture_url as profilePicture, p.url, p.description,
       json_agg(
         DISTINCT like_user.username
       ) as "likedBy",
@@ -84,7 +82,7 @@ function getReposts() {
           'id', u.id,
           'username', u.username
         )
-      ) as "user"
+      ) as "repostedBy"
     FROM reposts rp
       LEFT JOIN users u ON rp.id_user = u.id
       LEFT JOIN posts p ON p.id = rp.id_post
@@ -95,9 +93,8 @@ function getReposts() {
       LEFT JOIN users like_user ON like_user.id = l.id_user
       LEFT JOIN comments c ON c.id_post = p.id
       LEFT JOIN users comment_user ON comment_user.id = c.id_user
-    GROUP BY p.id, u.id, rp.id, user_post.username
+    GROUP BY p.id, u.id, rp.id, user_post.username, user_post.picture_url
     ORDER BY p.created_at DESC
-  LIMIT 10;
   `);
 }
 

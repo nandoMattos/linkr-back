@@ -42,6 +42,7 @@ export async function getAllPosts(req, res) {
     console.log(reposts)
 
     const postsByFolloweds = [];
+    const repostByFolloweds = [];
 
     for (let post of rows) {
       if (listFolloweds.includes(post.id)) {
@@ -52,10 +53,22 @@ export async function getAllPosts(req, res) {
 
         postsByFolloweds.push(post);
       }
-      
-
     }
-    console.log(postsByFolloweds)
+
+    for (let repost of reposts) {
+      console.log(listFolloweds)
+      console.log(repost.repostedBy[0].id)
+      if (listFolloweds.includes(repost.repostedBy[0].id)) {
+        const metadata = await urlMetadata(repost.url);
+        repost.title = metadata.title;
+        repost.image = metadata.image;
+        repost.linkDescription = metadata.description;
+        console.log("entrou no if")
+
+        postsByFolloweds.push(repost);
+      }
+    }
+    //console.log(reposts)
     res.send(postsByFolloweds);
   } catch (err) {
     console.log(err);
