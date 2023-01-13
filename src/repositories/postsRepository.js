@@ -65,6 +65,51 @@ function getAllPostsByUserId(id) {
   );
 }
 
+function amountReposted () {
+  return connection.query(`
+    SELECT id_post, COUNT(id_post)
+    FROM reposts
+    GROUP BY id_post
+  `)
+}
+
+function getReposts() {
+  return connection.query(
+    `
+    SELECT  p.id_user as "id", p.id as "postId", user_post.username, user_post.picture_url as profilePicture, p.url, p.description,
+      json_agg(
+        DISTINCT like_user.username
+      ) as "likedBy",
+      json_agg( DISTINCT
+        jsonb_build_object(
+          'id', c.id,
+          'userId', comment_user.id,
+          'comment', c.comment,
+          'profile_picture', comment_user.picture_url,
+          'username', comment_user.username
+        )
+      ) as "comments", 
+      json_agg( DISTINCT
+        jsonb_build_object(
+          'id', u.id,
+          'username', u.username
+        )
+      ) as "repostedBy"
+    FROM reposts rp
+      LEFT JOIN users u ON rp.id_user = u.id
+      LEFT JOIN posts p ON p.id = rp.id_post
+      LEFT JOIN users user_post ON user_post.id = p.id_user 
+      LEFT JOIN post_hashtag ph ON p.id = ph.id_post 
+      LEFT JOIN hashtags h ON h.id = ph.id_hashtag
+      LEFT JOIN likes l ON l.id_post = p.id
+      LEFT JOIN users like_user ON like_user.id = l.id_user
+      LEFT JOIN comments c ON c.id_post = p.id
+      LEFT JOIN users comment_user ON comment_user.id = c.id_user
+    GROUP BY p.id, u.id, rp.id, user_post.username, user_post.picture_url
+    ORDER BY p.created_at DESC
+  `);
+}
+
 function getPostsWithTag(tagId) {
   return connection.query(
     `
@@ -288,7 +333,9 @@ const postsRepository = {
   removeLikes,
   newDescriptionPost,
   insertComment,
-  respostBy
+  respostBy,
+  getReposts,
+  amountReposted
 };
 
 export default postsRepository;
