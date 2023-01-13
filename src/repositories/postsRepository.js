@@ -61,6 +61,14 @@ function getAllPostsByUserId(id) {
   );
 }
 
+function amountReposted () {
+  return connection.query(`
+    SELECT id_post, COUNT(id_post)
+    FROM reposts
+    GROUP BY id_post
+  `)
+}
+
 function getReposts() {
   return connection.query(
     `
@@ -321,7 +329,8 @@ const postsRepository = {
   newDescriptionPost,
   insertComment,
   respostBy,
-  getReposts
+  getReposts,
+  amountReposted
 };
 
 export default postsRepository;

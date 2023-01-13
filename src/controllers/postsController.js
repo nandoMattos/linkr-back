@@ -39,7 +39,8 @@ export async function getAllPosts(req, res) {
 
     const { rows } = await postsRepository.getAllPosts({ offset, noLimit });
     const { rows: reposts } = await postsRepository.getReposts();
-    console.log(reposts)
+    const { rows: repostedamounts } = await postsRepository.amountReposted();
+    console.log(repostedamounts)
 
     const postsByFolloweds = [];
     const repostByFolloweds = [];
@@ -52,6 +53,10 @@ export async function getAllPosts(req, res) {
         post.linkDescription = metadata.description;
 
         postsByFolloweds.push(post);
+
+        for (let countRep of repostedamounts) {
+          if (post.postId === countRep.id_post) post.repostCount = countRep.count
+        }
       }
     }
 
@@ -66,6 +71,10 @@ export async function getAllPosts(req, res) {
         console.log("entrou no if")
 
         postsByFolloweds.push(repost);
+
+        for (let countRep of repostedamounts) {
+          if (repost.postId === countRep.id_post) repost.repostCount = countRep.count
+        }
       }
     }
     //console.log(reposts)
