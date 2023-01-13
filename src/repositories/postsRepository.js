@@ -76,7 +76,7 @@ function amountReposted () {
 function getReposts() {
   return connection.query(
     `
-    SELECT  p.id_user as "id", p.id as "postId", user_post.username, user_post.picture_url as profilePicture, p.url, p.description,
+    SELECT  p.id_user as "id", p.id as "postId", user_post.username, user_post.picture_url as profilePicture, p.url, p.description, p.created_at,
       json_agg(
         DISTINCT like_user.username
       ) as "likedBy",
