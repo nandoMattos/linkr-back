@@ -9,6 +9,7 @@ function getAllPosts({ offset, noLimit }) {
       json_agg( DISTINCT
         jsonb_build_object(
             'id', c.id,
+            'userId', c.id_user,
             'comment', c.comment,
             'profile_picture', comment_user.picture_url,
             'username', comment_user.username
@@ -39,6 +40,7 @@ function getAllPostsByUserId(id) {
       json_agg( DISTINCT
         jsonb_build_object(
           'id', c.id,
+          'userId', c.id_user,
           'comment', c.comment,
           'profile_picture', comment_user.picture_url,
           'username', comment_user.username
@@ -73,6 +75,7 @@ function getPostsWithTag(tagId) {
       json_agg( DISTINCT
         jsonb_build_object(
           'id', c.id,
+          'userId', c.id_user,
           'comment', c.comment,
           'profile_picture', comment_user.picture_url,
           'username', comment_user.username
