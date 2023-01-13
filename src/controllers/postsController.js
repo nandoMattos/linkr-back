@@ -40,7 +40,7 @@ export async function getAllPosts(req, res) {
     const { rows } = await postsRepository.getAllPosts({ offset, noLimit });
     const { rows: reposts } = await postsRepository.getReposts();
     const { rows: repostedamounts } = await postsRepository.amountReposted();
-    console.log(repostedamounts)
+    //console.log(repostedamounts)
 
     const postsByFolloweds = [];
     const repostByFolloweds = [];
@@ -68,7 +68,7 @@ export async function getAllPosts(req, res) {
         repost.title = metadata.title;
         repost.image = metadata.image;
         repost.linkDescription = metadata.description;
-        console.log("entrou no if")
+        //console.log("entrou no if")
 
         postsByFolloweds.push(repost);
 
@@ -77,8 +77,12 @@ export async function getAllPosts(req, res) {
         }
       }
     }
-    //console.log(reposts)
-    res.send(postsByFolloweds);
+
+    // const postsByFollowedsByDate = postsByFolloweds.sort((a, b) => {
+    //   if (a, b) return 1
+    // })
+    res.send(postsByFolloweds)
+    //res.send(postsByFollowedsByDate);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
@@ -92,6 +96,7 @@ export async function getAllPostsByUserId(req, res) {
   try {
     const { rows } = await postsRepository.getAllPostsByUserId(id);
     const { rows: user } = await listUserById(id);
+    const { rows: repostedamounts } = await postsRepository.amountReposted();
 
 
     for (const post of rows) {
@@ -99,6 +104,10 @@ export async function getAllPostsByUserId(req, res) {
       post.title = metadata.title;
       post.image = metadata.image;
       post.linkDescription = metadata.description;
+
+      for (let countRep of repostedamounts) {
+        if (post.postId === countRep.id_post) post.repostCount = countRep.count
+      }
     }
 
     res.send({ posts: rows, username: user[0].username });
@@ -167,7 +176,7 @@ export async function deletePost(req, res) {
     treatement.add(hashtag)
   })
   const hashtags = [...treatement.values()]
-  console.log(hashtags)
+ 
 
   try {
     if (hashtags) {
